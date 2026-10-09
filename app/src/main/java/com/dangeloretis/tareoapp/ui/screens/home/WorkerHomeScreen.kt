@@ -240,6 +240,7 @@ fun WorkerHomeScreen(
         LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
             items(attendances) { attendance ->
                 val typeStr = if (attendance.type == AttendanceType.CHECK_IN) "Entrada" else "Salida"
+                @Suppress("NonObservableLocale")
                 val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(attendance.deviceTimeMillis))
                 
                 val syncIcon = when (attendance.syncStatus) {
