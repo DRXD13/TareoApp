@@ -1,8 +1,10 @@
 package com.dangeloretis.tareoapp.di
 
+import com.dangeloretis.tareoapp.data.remote.AttendanceRemoteDataSource
+import com.dangeloretis.tareoapp.data.remote.FakeAttendanceRemoteDataSource
 import com.dangeloretis.tareoapp.data.repository.DemoAuthRepository
 import com.dangeloretis.tareoapp.data.repository.DemoSiteRepository
-import com.dangeloretis.tareoapp.data.repository.InMemoryAttendanceRepository
+import com.dangeloretis.tareoapp.data.repository.RoomAttendanceRepository
 import com.dangeloretis.tareoapp.domain.repository.AuthRepository
 import com.dangeloretis.tareoapp.domain.repository.AttendanceRepository
 import com.dangeloretis.tareoapp.domain.repository.SiteRepository
@@ -31,6 +33,11 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAttendanceRepository(
-        inMemoryAttendanceRepository: InMemoryAttendanceRepository
+        roomAttendanceRepository: RoomAttendanceRepository
     ): AttendanceRepository
+    @Binds
+    @Singleton
+    abstract fun bindAttendanceRemoteDataSource(
+        fakeAttendanceRemoteDataSource: FakeAttendanceRemoteDataSource
+    ): AttendanceRemoteDataSource
 }

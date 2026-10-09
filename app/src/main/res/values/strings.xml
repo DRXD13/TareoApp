@@ -25,7 +25,9 @@
     <string name="gps_disabled">El GPS está desactivado. Actívelo para continuar.</string>
 
     <string name="site_label">Sede: %1$s</string>
-    <string name="distance_label">Distancia: %.0f metros</string>
+    <string name="distance_label">Distancia: %1$s</string>
+    <string name="distance_format_m">%.0f m</string>
+    <string name="distance_format_km">%,.1f km</string>
     <string name="inside_zone">Dentro de la zona</string>
     <string name="outside_zone">Fuera de la zona</string>
 
@@ -39,4 +41,10 @@
     <string name="error_out_of_radius">Error: Fuera del radio permitido.</string>
     <string name="error_too_soon">Error: Debe esperar %1$d segundos para el siguiente marcaje.</string>
     <string name="wait_time_msg">Podrás marcar de nuevo en %1$d segundos</string>
+
+    <!-- Sync -->
+    <string name="status_pending">Pendiente</string>
+    <string name="status_synced">Sincronizado</string>
+    <string name="status_error">Error</string>
+    <string name="pending_syncs_msg">%1$d marcajes pendientes de sincronizar</string>
 </resources>

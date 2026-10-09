@@ -17,6 +17,9 @@ TareoApp es una aplicación móvil enfocada en el control de personal, registro 
 - Modo demo con datos de ejemplo que funciona sin servidor.
 - API REST propia con Retrofit (fase posterior).
 
+## Flujo offline
+Los marcajes se guardan primero de manera local en Room con un estado inicial `PENDING`. WorkManager se encarga de observar los marcajes en estado `PENDING` o `FAILED` y simula una subida en un worker asíncrono con un retraso de 2 segundos. Una vez procesados exitosamente, el estado cambia a `SYNCED` con un timestamp de sincronización; en caso de error o sin conexión, el worker vuelve a reintentar usando backoff exponencial, garantizando la persistencia offline.
+
 ## Convenciones
 Código, clases y variables en inglés. Textos visibles para el usuario en español, dentro de strings.xml.
 
