@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.dangeloretis.tareoapp.data.local.dao.AttendanceDao
 import com.dangeloretis.tareoapp.data.local.db.TareoDatabase
+import com.dangeloretis.tareoapp.data.local.dao.CrewTareoDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,5 +32,11 @@ object DatabaseModule {
     @Singleton
     fun provideAttendanceDao(database: TareoDatabase): AttendanceDao {
         return database.attendanceDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCrewTareoDao(database: TareoDatabase): CrewTareoDao {
+        return database.crewTareoDao()
     }
 }

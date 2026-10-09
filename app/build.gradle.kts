@@ -41,12 +41,19 @@ android {
     buildFeatures {
         compose = true
     }
+    
+    sourceSets {
+        getByName("androidTest") {
+            assets.srcDirs("$projectDir/schemas")
+        }
+    }
 }
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -81,10 +88,20 @@ dependencies {
     // Location
     implementation(libs.play.services.location)
     
+    // CameraX and ML Kit
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
+    
+    // ZXing for QR generation
+    implementation(libs.zxing.core)
+    
     testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation(libs.room.testing)
+    androidTestImplementation(libs.room.testing)
     testImplementation(libs.robolectric)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("androidx.test:core-ktx:1.6.1")

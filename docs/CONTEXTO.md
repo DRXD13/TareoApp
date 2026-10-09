@@ -13,7 +13,13 @@ TareoApp es una aplicación móvil enfocada en el control de personal, registro 
 - Detección de ubicación simulada (GPS falso).
 - Hora confiable para marcajes offline (guardar también el tiempo transcurrido desde el arranque del equipo).
 - Tareo de cuadrillas por QR o DNI, con labor y lote.
-- Offline-first: los marcajes se guardan en Room y se sincronizan con WorkManager.
+- Offline-first: los marcajes y tareos se guardan en Room y se sincronizan con WorkManager.
+
+## Tareo de cuadrillas
+- Los tareadores (encargados) pueden registrar la asistencia y avance de los trabajadores de una cuadrilla en una labor y un lote específicos.
+- El registro se realiza mediante la lectura del código QR del trabajador o digitando manualmente su DNI.
+- Existen restricciones en el registro: el DNI debe corresponder a un trabajador activo en la base de datos local y no se permite registrar a la misma persona más de una vez en el mismo día para la misma labor y lote.
+- Estos registros (`CrewTareoEntity`) se almacenan de manera local con estado `PENDING` y son sincronizados junto con los marcajes convencionales a través de `SyncAttendanceWorker`.
 - Modo demo con datos de ejemplo que funciona sin servidor.
 - API REST propia con Retrofit (fase posterior).
 

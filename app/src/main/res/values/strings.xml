@@ -46,5 +46,12 @@
     <string name="status_pending">Pendiente</string>
     <string name="status_synced">Sincronizado</string>
     <string name="status_error">Error</string>
-    <string name="pending_syncs_msg">%1$d marcajes pendientes de sincronizar</string>
+    <plurals name="marcajes_pendientes">
+        <item quantity="one">%1$d marcaje pendiente</item>
+        <item quantity="other">%1$d marcajes pendientes</item>
+    </plurals>
+    <plurals name="trabajadores_registrados">
+        <item quantity="one">%1$d trabajador registrado</item>
+        <item quantity="other">%1$d trabajadores registrados</item>
+    </plurals>
 </resources>

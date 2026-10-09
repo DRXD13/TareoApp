@@ -14,4 +14,7 @@ sealed interface Screen {
 
     @Serializable
     data object AdminHome : Screen
+
+    @Serializable
+    data object QrScanner : Screen
 }

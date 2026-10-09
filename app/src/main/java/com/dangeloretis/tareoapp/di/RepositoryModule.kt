@@ -40,4 +40,25 @@ abstract class RepositoryModule {
     abstract fun bindAttendanceRemoteDataSource(
         fakeAttendanceRemoteDataSource: FakeAttendanceRemoteDataSource
     ): AttendanceRemoteDataSource
+    @Binds
+    @Singleton
+    abstract fun bindWorkerDirectoryRepository(
+        demoWorkerDirectoryRepository: com.dangeloretis.tareoapp.data.repository.DemoWorkerDirectoryRepository
+    ): com.dangeloretis.tareoapp.domain.repository.WorkerDirectoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCatalogRepository(
+        demoCatalogRepository: com.dangeloretis.tareoapp.data.repository.DemoCatalogRepository
+    ): com.dangeloretis.tareoapp.domain.repository.CatalogRepository
+    @Binds
+    @Singleton
+    abstract fun bindCrewTareoRepository(
+        roomCrewTareoRepository: com.dangeloretis.tareoapp.data.repository.RoomCrewTareoRepository
+    ): com.dangeloretis.tareoapp.domain.repository.CrewTareoRepository
+    @Binds
+    @Singleton
+    abstract fun bindCrewTareoRemoteDataSource(
+        fakeCrewTareoRemoteDataSource: com.dangeloretis.tareoapp.data.remote.FakeCrewTareoRemoteDataSource
+    ): com.dangeloretis.tareoapp.data.remote.CrewTareoRemoteDataSource
 }

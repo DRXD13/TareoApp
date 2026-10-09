@@ -26,7 +26,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.material3.Icon
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.ui.res.pluralStringResource
 import com.dangeloretis.tareoapp.data.local.entity.SyncStatus
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -34,6 +39,7 @@ import com.dangeloretis.tareoapp.R
 import com.dangeloretis.tareoapp.domain.model.AttendanceType
 import com.dangeloretis.tareoapp.domain.model.UserRole
 import com.dangeloretis.tareoapp.domain.usecase.ValidationResult
+import com.dangeloretis.tareoapp.ui.components.QrCodeImage
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -228,7 +234,7 @@ fun WorkerHomeScreen(
         val pendingCount = attendances.count { it.syncStatus == SyncStatus.PENDING || it.syncStatus == SyncStatus.FAILED }
         if (pendingCount > 0) {
             Text(
-                text = stringResource(R.string.pending_syncs_msg, pendingCount),
+                text = pluralStringResource(id = R.plurals.marcajes_pendientes, count = pendingCount, pendingCount),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 4.dp)
@@ -240,13 +246,14 @@ fun WorkerHomeScreen(
         LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
             items(attendances) { attendance ->
                 val typeStr = if (attendance.type == AttendanceType.CHECK_IN) "Entrada" else "Salida"
-                @Suppress("NonObservableLocale")
-                val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(attendance.deviceTimeMillis))
+                
+                val locale = LocalConfiguration.current.locales[0]
+                val timeStr = SimpleDateFormat("HH:mm:ss", locale).format(Date(attendance.deviceTimeMillis))
                 
                 val syncIcon = when (attendance.syncStatus) {
-                    SyncStatus.PENDING -> "⏳"
-                    SyncStatus.SYNCED -> "✅"
-                    SyncStatus.FAILED -> "❌"
+                    SyncStatus.PENDING -> Icons.Default.Schedule
+                    SyncStatus.SYNCED -> Icons.Default.CheckCircle
+                    SyncStatus.FAILED -> Icons.Default.Error
                 }
                 val syncColor = when (attendance.syncStatus) {
                     SyncStatus.PENDING -> Color.Gray
@@ -265,9 +272,11 @@ fun WorkerHomeScreen(
                         Column(horizontalAlignment = Alignment.End) {
                             Text(timeStr)
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = syncIcon,
-                                    modifier = Modifier.padding(end = 4.dp)
+                                Icon(
+                                    imageVector = syncIcon,
+                                    contentDescription = syncText,
+                                    tint = syncColor,
+                                    modifier = Modifier.padding(end = 4.dp).size(16.dp)
                                 )
                                 Text(
                                     text = syncText,
@@ -282,11 +291,36 @@ fun WorkerHomeScreen(
             }
         }
 
-        Button(onClick = {
-            viewModel.logout()
-            onLogout()
-        }) {
-            Text(stringResource(R.string.logout_button))
+        var showQrDialog by remember { mutableStateOf(false) }
+
+        if (showQrDialog) {
+            AlertDialog(
+                onDismissRequest = { showQrDialog = false },
+                title = { Text("Mi código QR") },
+                text = {
+                    val dni = state.user?.id ?: "" // User id is DNI
+                    // We generate QR here (using ZXing later, for now just a box, we need a composable)
+                    QrCodeImage(text = dni)
+                },
+                confirmButton = {
+                    TextButton(onClick = { showQrDialog = false }) {
+                        Text("Cerrar")
+                    }
+                }
+            )
+        }
+
+        Row {
+            Button(onClick = { showQrDialog = true }) {
+                Text("Mi código QR")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = {
+                viewModel.logout()
+                onLogout()
+            }) {
+                Text(stringResource(R.string.logout_button))
+            }
         }
     }
 }
