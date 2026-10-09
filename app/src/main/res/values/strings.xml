@@ -1,3 +1,42 @@
 <resources>
     <string name="app_name">TareoApp</string>
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="dni_label">DNI</string>
+    <string name="pin_label">PIN</string>
+    <string name="login_button">Ingresar</string>
+    <string name="demo_mode_title">Modo demo (Usuarios de prueba)</string>
+    <string name="worker_demo_label">Trabajador (DNI: 11111111)</string>
+    <string name="tareador_demo_label">Tareador (DNI: 22222222)</string>
+    <string name="admin_demo_label">Admin (DNI: 33333333)</string>
+    <string name="error_invalid_dni">El DNI debe tener 8 dígitos</string>
+    <string name="error_invalid_pin">El PIN debe tener 4 dígitos</string>
+    <string name="logout_button">Cerrar sesión</string>
+    <string name="hello_user">Hola, %1$s</string>
+    <string name="role_label">Rol: %1$s</string>
+    <string name="role_worker">Trabajador</string>
+    <string name="role_tareador">Tareador</string>
+    <string name="role_admin">Administrador</string>
+
+    <!-- Worker Home -->
+    <string name="permission_rationale">Esta aplicación necesita acceso a su ubicación para poder registrar su asistencia en la sede correspondiente.</string>
+    <string name="grant_permission_btn">Conceder Permiso</string>
+    <string name="open_settings_btn">Abrir Ajustes</string>
+    <string name="permission_denied_permanently">El permiso de ubicación ha sido denegado permanentemente. Por favor actívelo en la configuración de su dispositivo.</string>
+    <string name="gps_disabled">El GPS está desactivado. Actívelo para continuar.</string>
+
+    <string name="site_label">Sede: %1$s</string>
+    <string name="distance_label">Distancia: %.0f metros</string>
+    <string name="inside_zone">Dentro de la zona</string>
+    <string name="outside_zone">Fuera de la zona</string>
+
+    <string name="check_in_btn">Marcar Entrada</string>
+    <string name="check_out_btn">Marcar Salida</string>
+
+    <string name="attendances_title">Marcajes de hoy</string>
+
+    <string name="error_mock_location">Error: Ubicación simulada (GPS falso) detectada.</string>
+    <string name="error_low_accuracy">Error: Baja precisión del GPS.</string>
+    <string name="error_out_of_radius">Error: Fuera del radio permitido.</string>
+    <string name="error_too_soon">Error: Debe esperar %1$d segundos para el siguiente marcaje.</string>
+    <string name="wait_time_msg">Podrás marcar de nuevo en %1$d segundos</string>
 </resources>

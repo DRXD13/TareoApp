@@ -8,10 +8,17 @@ TareoApp es una aplicación móvil enfocada en el control de personal, registro 
 - **Tareador:** Encargado de campo (Supervisor/Controlador) que registra la asistencia de las cuadrillas, asigna tareas y maneja la recolección de datos localmente.
 - **Admin:** Administrador encargado de la configuración global, gestión de proyectos, empleados, centros de costo y visualización de reportes integrales.
 
-## Funciones Clave
-- Registro de Asistencia y Tareas (Check-in/Check-out).
-- Funcionamiento Offline-First (Local Database).
-- Sincronización de Datos con el Backend.
+## Funciones clave
+- Marcaje de entrada y salida con GPS, solo dentro de la geocerca (radio) de la sede.
+- Detección de ubicación simulada (GPS falso).
+- Hora confiable para marcajes offline (guardar también el tiempo transcurrido desde el arranque del equipo).
+- Tareo de cuadrillas por QR o DNI, con labor y lote.
+- Offline-first: los marcajes se guardan en Room y se sincronizan con WorkManager.
+- Modo demo con datos de ejemplo que funciona sin servidor.
+- API REST propia con Retrofit (fase posterior).
+
+## Convenciones
+Código, clases y variables en inglés. Textos visibles para el usuario en español, dentro de strings.xml.
 
 ## Arquitectura y Stack Tecnológico
 - **Arquitectura:** Clean Architecture y Single Source of Truth, aplicando el patrón MVVM.
