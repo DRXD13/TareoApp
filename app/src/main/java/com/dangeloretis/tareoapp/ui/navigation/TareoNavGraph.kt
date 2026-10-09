@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.dangeloretis.tareoapp.domain.model.UserRole
 import com.dangeloretis.tareoapp.presentation.tareador.TareadorHomeScreen
 import com.dangeloretis.tareoapp.presentation.tareador.QrScannerScreen
-import com.dangeloretis.tareoapp.ui.screens.home.AdminHomeScreen
+import com.dangeloretis.tareoapp.ui.screens.home.admin.AdminHomeScreen
 import com.dangeloretis.tareoapp.ui.screens.home.WorkerHomeScreen
 import com.dangeloretis.tareoapp.ui.screens.login.LoginScreen
 

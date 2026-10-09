@@ -25,4 +25,7 @@ interface AttendanceDao {
 
     @Query("UPDATE attendances SET syncStatus = :status, syncedAtMillis = :syncedAt WHERE id IN (:ids)")
     suspend fun updateSyncStatus(ids: List<String>, status: SyncStatus, syncedAt: Long?): Int
+
+    @Query("SELECT COUNT(*) FROM attendances WHERE siteId = :siteId")
+    suspend fun getAttendancesCountForSite(siteId: String): Int
 }

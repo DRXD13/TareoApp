@@ -13,6 +13,7 @@ import com.dangeloretis.tareoapp.domain.model.User
 import com.dangeloretis.tareoapp.domain.repository.AttendanceRepository
 import com.dangeloretis.tareoapp.domain.repository.AuthRepository
 import com.dangeloretis.tareoapp.domain.repository.SiteRepository
+import com.dangeloretis.tareoapp.domain.usecase.GetClosestSiteUseCase
 import com.dangeloretis.tareoapp.domain.usecase.RegisterAttendanceUseCase
 import com.dangeloretis.tareoapp.domain.usecase.ValidateCheckInUseCase
 import com.dangeloretis.tareoapp.domain.usecase.ValidationResult
@@ -55,7 +56,8 @@ class WorkerViewModel @Inject constructor(
     private val siteRepository: SiteRepository,
     private val attendanceRepository: AttendanceRepository,
     private val validateCheckInUseCase: ValidateCheckInUseCase,
-    private val registerAttendanceUseCase: RegisterAttendanceUseCase
+    private val registerAttendanceUseCase: RegisterAttendanceUseCase,
+    private val getClosestSiteUseCase: GetClosestSiteUseCase
 ) : ViewModel() {
 
     private val fusedLocationClient: FusedLocationProviderClient = 
@@ -66,6 +68,8 @@ class WorkerViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(WorkerState())
     val state: StateFlow<WorkerState> = _state.asStateFlow()
+
+    private var activeSitesCache: List<Site> = emptyList()
 
     val attendances: StateFlow<List<Attendance>> = authRepository.currentUser()
         .flatMapLatest { user ->
@@ -102,9 +106,85 @@ class WorkerViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val user = authRepository.currentUser().value
-            val site = siteRepository.getDefaultSite()
-            _state.update { it.copy(user = user, site = site) }
+            authRepository.currentUser().collect { user ->
+                _state.update { it.copy(user = user) }
+            }
+        }
+        viewModelScope.launch {
+            siteRepository.getActiveSitesFlow().collect { activeSites ->
+                activeSitesCache = activeSites
+                updateLocationAndSite(_state.value.currentLocation)
+            }
+        }
+    }
+
+    private fun updateLocationAndSite(location: Location?) {
+        if (activeSitesCache.isEmpty()) {
+            _state.update {
+                it.copy(
+                    site = null,
+                    currentLocation = location,
+                    distance = null,
+                    validationResult = null,
+                    errorMessage = application.getString(R.string.no_active_sites)
+                )
+            }
+            return
+        }
+
+        if (location != null) {
+            val closestSite = getClosestSiteUseCase(activeSitesCache, location.latitude, location.longitude)
+            if (closestSite != null) {
+                val isMock = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    location.isMock
+                } else {
+                    @Suppress("DEPRECATION")
+                    location.isFromMockProvider
+                }
+                val (result, dist) = validateCheckInUseCase(
+                    site = closestSite,
+                    latitude = location.latitude,
+                    longitude = location.longitude,
+                    accuracy = location.accuracy,
+                    isMock = isMock,
+                    lastAttendance = null,
+                    currentElapsedRealtimeMillis = 0L
+                )
+                _state.update {
+                    it.copy(
+                        site = closestSite,
+                        currentLocation = location,
+                        distance = dist,
+                        validationResult = result,
+                        errorMessage = when (result) {
+                            is ValidationResult.MockLocationDetected -> application.getString(R.string.error_mock_location)
+                            is ValidationResult.LowAccuracy -> application.getString(R.string.error_low_accuracy)
+                            is ValidationResult.OutOfRadius -> application.getString(R.string.error_out_of_radius)
+                            is ValidationResult.TooSoon -> null
+                            is ValidationResult.Valid -> null
+                        }
+                    )
+                }
+            } else {
+                _state.update {
+                    it.copy(
+                        site = null,
+                        currentLocation = location,
+                        distance = null,
+                        validationResult = null,
+                        errorMessage = application.getString(R.string.no_active_sites)
+                    )
+                }
+            }
+        } else {
+            // Default to first active site if location is not available yet
+            val firstSite = activeSitesCache.firstOrNull()
+            _state.update {
+                it.copy(
+                    site = firstSite,
+                    errorMessage = if (firstSite == null) application.getString(R.string.no_active_sites) else null
+                )
+            }
         }
     }
 
@@ -117,40 +197,7 @@ class WorkerViewModel @Inject constructor(
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult.lastLocation?.let { loc ->
-                    val currentState = _state.value
-                    if (currentState.site != null) {
-                        val isMock = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                            loc.isMock
-                        } else {
-                            @Suppress("DEPRECATION")
-                            loc.isFromMockProvider
-                        }
-                        
-                        // Pass null for lastAttendance in the continuous update, because TooSoon is handled by timeRemainingSeconds timer
-                        val (result, dist) = validateCheckInUseCase(
-                            site = currentState.site,
-                            latitude = loc.latitude,
-                            longitude = loc.longitude,
-                            accuracy = loc.accuracy,
-                            isMock = isMock,
-                            lastAttendance = null,
-                            currentElapsedRealtimeMillis = 0L
-                        )
-                        _state.update { 
-                            it.copy(
-                                currentLocation = loc,
-                                distance = dist,
-                                validationResult = result,
-                                errorMessage = when (result) {
-                                    is ValidationResult.MockLocationDetected -> application.getString(R.string.error_mock_location)
-                                    is ValidationResult.LowAccuracy -> application.getString(R.string.error_low_accuracy)
-                                    is ValidationResult.OutOfRadius -> application.getString(R.string.error_out_of_radius)
-                                    is ValidationResult.TooSoon -> null // Handled separately
-                                    is ValidationResult.Valid -> null
-                                }
-                            ) 
-                        }
-                    }
+                    updateLocationAndSite(loc)
                 }
             }
         }

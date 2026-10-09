@@ -54,4 +54,27 @@
         <item quantity="one">%1$d trabajador registrado</item>
         <item quantity="other">%1$d trabajadores registrados</item>
     </plurals>
+
+    <!-- Admin -->
+    <string name="tab_sites">Sedes</string>
+    <string name="tab_reports">Reportes</string>
+    <string name="coming_soon">Próximamente</string>
+    <string name="add_site">Nueva sede</string>
+    <string name="new_site">Crear Sede</string>
+    <string name="edit_site">Editar Sede</string>
+    <string name="site_name">Nombre</string>
+    <string name="latitude">Latitud</string>
+    <string name="longitude">Longitud</string>
+    <string name="use_my_location">Usar mi ubicación actual</string>
+    <string name="radius_meters">Radio (metros)</string>
+    <string name="radius_format">%.1f metros</string>
+    <string name="no_active_sites">No hay sedes activas</string>
+    <string name="delete_site">Eliminar sede</string>
+    <string name="delete_site_confirm_title">¿Eliminar sede?</string>
+    <string name="delete_site_confirm_msg">¿Está seguro de que desea eliminar la sede "%1$s"?</string>
+    <string name="delete">Eliminar</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="error">Error</string>
+    <string name="ok">Aceptar</string>
 </resources>

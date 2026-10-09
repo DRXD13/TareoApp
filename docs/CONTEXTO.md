@@ -15,6 +15,13 @@ TareoApp es una aplicación móvil enfocada en el control de personal, registro 
 - Tareo de cuadrillas por QR o DNI, con labor y lote.
 - Offline-first: los marcajes y tareos se guardan en Room y se sincronizan con WorkManager.
 
+## Administración de sedes
+- Los usuarios con rol Admin pueden gestionar las sedes (ubicaciones de trabajo) desde la aplicación.
+- Las sedes tienen un nombre, latitud, longitud, radio en metros (geocerca) y un estado de activación.
+- El administrador puede editar sedes existentes, crear nuevas, capturar las coordenadas GPS actuales y eliminar sedes (con diálogo de confirmación).
+- Restricciones para eliminación de sedes: no se permite eliminar la última sede activa ni una sede que ya tenga marcajes asociados; en esos casos solo se permite desactivar.
+- El trabajador valida su marcaje contra la **sede activa más cercana** a su ubicación GPS actual (`GetClosestSiteUseCase`). Si no existe ninguna sede activa, la app muestra "No hay sedes activas" y deshabilita la opción de marcar. Cada marcaje almacena el `siteId` correspondiente a la sede utilizada.
+
 ## Tareo de cuadrillas
 - Los tareadores (encargados) pueden registrar la asistencia y avance de los trabajadores de una cuadrilla en una labor y un lote específicos.
 - El registro se realiza mediante la lectura del código QR del trabajador o digitando manualmente su DNI.

@@ -52,6 +52,12 @@ class RoomAttendanceRepository @Inject constructor(
         }
         enqueueSyncWorker()
     }
+
+    override suspend fun getAttendancesCountForSite(siteId: String): Int {
+        return withContext(Dispatchers.IO) {
+            attendanceDao.getAttendancesCountForSite(siteId)
+        }
+    }
     
     private fun enqueueSyncWorker() {
         val constraints = Constraints.Builder()

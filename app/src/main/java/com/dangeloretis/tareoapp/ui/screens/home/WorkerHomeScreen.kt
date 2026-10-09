@@ -159,7 +159,8 @@ fun WorkerHomeScreen(
             )
         } else {
             // Location Content
-            state.site?.let { site ->
+            if (state.site != null) {
+                val site = state.site!!
                 Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                     Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = stringResource(R.string.site_label, site.name), style = MaterialTheme.typography.titleMedium)
@@ -223,6 +224,26 @@ fun WorkerHomeScreen(
                     } else {
                         Text(btnText, style = MaterialTheme.typography.titleMedium)
                     }
+                }
+            } else {
+                Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = stringResource(R.string.no_active_sites),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { },
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                ) {
+                    Text(stringResource(R.string.check_in_btn), style = MaterialTheme.typography.titleMedium)
                 }
             }
         }
