@@ -77,4 +77,22 @@
     <string name="cancel">Cancelar</string>
     <string name="error">Error</string>
     <string name="ok">Aceptar</string>
+    <!-- Reports -->
+    <string name="report_today">Hoy</string>
+    <string name="report_last_7_days">Últimos 7 días</string>
+    <string name="report_this_month">Este mes</string>
+    <string name="report_present">Presentes</string>
+    <string name="report_attendances">Asistencias</string>
+    <string name="report_lateness">Tardanzas</string>
+    <string name="report_absence">Faltas</string>
+    <string name="report_hours">Horas</string>
+    <string name="load_mocks">Cargar datos de ejemplo</string>
+    <string name="clear_mocks">Borrar datos de ejemplo</string>
+    <string name="export_csv">Exportar CSV</string>
+    <string name="tareo_por_labor">Tareo por labor (Cuadrilla)</string>
+    <plurals name="registros_count">
+        <item quantity="one">%1$d registro</item>
+        <item quantity="other">%1$d registros</item>
+    </plurals>
+    <string name="detail_by_worker">Detalle por trabajador</string>
 </resources>

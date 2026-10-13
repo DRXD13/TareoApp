@@ -21,4 +21,8 @@ class DemoWorkerDirectoryRepository @Inject constructor() : WorkerDirectoryRepos
     override suspend fun getWorkerByDni(dni: String): Worker? {
         return workers.find { it.dni == dni }
     }
+    
+    override suspend fun getAllWorkers(): List<Worker> {
+        return workers
+    }
 }

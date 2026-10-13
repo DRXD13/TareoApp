@@ -4,4 +4,5 @@ import com.dangeloretis.tareoapp.domain.model.Worker
 
 interface WorkerDirectoryRepository {
     suspend fun getWorkerByDni(dni: String): Worker?
+    suspend fun getAllWorkers(): List<Worker>
 }

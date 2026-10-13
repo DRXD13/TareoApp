@@ -14,6 +14,9 @@ interface AttendanceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(attendance: AttendanceEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(attendances: List<AttendanceEntity>): List<Long>
+
     @Query("SELECT * FROM attendances WHERE userId = :userId ORDER BY deviceTimeMillis DESC")
     fun getAttendances(userId: String): Flow<List<AttendanceEntity>>
 
@@ -28,4 +31,10 @@ interface AttendanceDao {
 
     @Query("SELECT COUNT(*) FROM attendances WHERE siteId = :siteId")
     suspend fun getAttendancesCountForSite(siteId: String): Int
+
+    @Query("SELECT * FROM attendances")
+    suspend fun getAllSync(): List<AttendanceEntity>
+
+    @Query("DELETE FROM attendances WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>): Int
 }

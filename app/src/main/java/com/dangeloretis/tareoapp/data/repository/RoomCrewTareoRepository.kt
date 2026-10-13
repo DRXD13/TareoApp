@@ -73,4 +73,10 @@ class RoomCrewTareoRepository @Inject constructor(
             existingTareo != null
         }
     }
+    
+    override suspend fun getAllTareos(): List<CrewTareoEntity> {
+        return withContext(Dispatchers.IO) {
+            crewTareoDao.getAllSync()
+        }
+    }
 }

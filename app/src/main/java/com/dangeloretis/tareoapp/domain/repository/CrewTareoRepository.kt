@@ -7,4 +7,5 @@ interface CrewTareoRepository {
     suspend fun saveTareo(tareo: CrewTareoEntity)
     fun getTareosForTareador(tareadorId: String): Flow<List<CrewTareoEntity>>
     suspend fun hasWorkerRegisteredOnDay(dni: String, laborId: String, loteId: String, timestamp: Long): Boolean
+    suspend fun getAllTareos(): List<CrewTareoEntity>
 }

@@ -53,9 +53,27 @@ class RoomAttendanceRepository @Inject constructor(
         enqueueSyncWorker()
     }
 
+    override suspend fun saveAttendances(attendances: List<Attendance>) {
+        withContext(Dispatchers.IO) {
+            attendanceDao.insertAll(attendances.map { it.toEntity(syncStatusOverride = SyncStatus.SYNCED) })
+        }
+    }
+
     override suspend fun getAttendancesCountForSite(siteId: String): Int {
         return withContext(Dispatchers.IO) {
             attendanceDao.getAttendancesCountForSite(siteId)
+        }
+    }
+    
+    override suspend fun getAllAttendances(): List<Attendance> {
+        return withContext(Dispatchers.IO) {
+            attendanceDao.getAllSync().map { it.toDomain() }
+        }
+    }
+    
+    override suspend fun deleteAttendances(ids: List<String>) {
+        withContext(Dispatchers.IO) {
+            attendanceDao.deleteByIds(ids)
         }
     }
     

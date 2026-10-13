@@ -14,9 +14,9 @@ class DemoAuthRepository @Inject constructor() : AuthRepository {
 
     // Simulando base de datos o API (DNI -> PIN to User)
     private val demoUsers = mapOf(
-        "11111111" to Pair("1111", User("1", "11111111", "Juan Perez (Trabajador)", UserRole.WORKER)),
-        "22222222" to Pair("2222", User("2", "22222222", "Carlos Gómez (Tareador)", UserRole.TAREADOR)),
-        "33333333" to Pair("3333", User("3", "33333333", "Ana Silva (Admin)", UserRole.ADMIN))
+        "11111111" to Pair("1111", User("11111111", "11111111", "Juan Perez (Trabajador)", UserRole.WORKER)),
+        "22222222" to Pair("2222", User("22222222", "22222222", "Carlos Gómez (Tareador)", UserRole.TAREADOR)),
+        "33333333" to Pair("3333", User("33333333", "33333333", "Ana Silva (Admin)", UserRole.ADMIN))
     )
 
     override fun currentUser(): StateFlow<User?> = _currentUser.asStateFlow()

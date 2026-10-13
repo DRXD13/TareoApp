@@ -22,6 +22,16 @@ TareoApp es una aplicación móvil enfocada en el control de personal, registro 
 - Restricciones para eliminación de sedes: no se permite eliminar la última sede activa ni una sede que ya tenga marcajes asociados; en esos casos solo se permite desactivar.
 - El trabajador valida su marcaje contra la **sede activa más cercana** a su ubicación GPS actual (`GetClosestSiteUseCase`). Si no existe ninguna sede activa, la app muestra "No hay sedes activas" y deshabilita la opción de marcar. Cada marcaje almacena el `siteId` correspondiente a la sede utilizada.
 
+## Reportes (Admin)
+- La aplicación incluye una pestaña de "Reportes" exclusiva para administradores.
+- Los reportes consolidan la asistencia de todos los trabajadores (entradas y salidas) y los comparan con el `WorkSchedule` (08:00 a 17:00, tolerancia de 10 minutos, lunes a sábado).
+- Se permite filtrar por: Hoy, Últimos 7 días, Este mes.
+- Tarjetas resumen: Presentes, Tardanzas, Faltas y Horas trabajadas.
+- Lista detallada por trabajador con DNI, total de asistencias, faltas, tardanzas, y vista desglosada diaria por cada marcaje, mostrando su estado (Puntual, Tardanza, Falta, Jornada incompleta).
+- Sección resumen del tareo de cuadrillas ("Tareo por labor"), agrupando la cantidad de registros por Labor y Lote en el periodo seleccionado.
+- Funcionalidad para inyectar/eliminar "Datos de ejemplo" y facilitar pruebas locales.
+- Botón para exportar y compartir el reporte completo en formato CSV (con soporte UTF-8 BOM, compatible con Excel).
+
 ## Tareo de cuadrillas
 - Los tareadores (encargados) pueden registrar la asistencia y avance de los trabajadores de una cuadrilla en una labor y un lote específicos.
 - El registro se realiza mediante la lectura del código QR del trabajador o digitando manualmente su DNI.

@@ -15,7 +15,7 @@ import com.dangeloretis.tareoapp.data.local.entity.SiteEntity
 
 @Database(
     entities = [AttendanceEntity::class, CrewTareoEntity::class, SiteEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2)
@@ -49,6 +49,14 @@ abstract class TareoDatabase : RoomDatabase() {
                     VALUES ('demo_site_1', 'Sede Central Demo', 37.4220, -122.0841, 100.0, 1)
                     """.trimIndent()
                 )
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("UPDATE attendances SET userId = '11111111' WHERE userId = '1'")
+                db.execSQL("UPDATE attendances SET userId = '22222222' WHERE userId = '2'")
+                db.execSQL("UPDATE attendances SET userId = '33333333' WHERE userId = '3'")
             }
         }
     }

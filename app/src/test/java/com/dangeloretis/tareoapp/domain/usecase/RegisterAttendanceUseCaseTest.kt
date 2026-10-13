@@ -30,6 +30,12 @@ class RegisterAttendanceUseCaseTest {
         override suspend fun saveAttendance(attendance: Attendance) {
             attendancesFlow.value = attendancesFlow.value + attendance
         }
+        override suspend fun saveAttendances(attendances: List<Attendance>) {
+            attendancesFlow.value = attendancesFlow.value + attendances
+        }
+        override suspend fun getAttendancesCountForSite(siteId: String): Int = 0
+        override suspend fun getAllAttendances(): List<Attendance> = attendancesFlow.value
+        override suspend fun deleteAttendances(ids: List<String>) {}
     }
 
     private val calculateDistanceUseCase = CalculateDistanceUseCase()

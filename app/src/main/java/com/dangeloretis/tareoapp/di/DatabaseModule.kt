@@ -27,7 +27,7 @@ object DatabaseModule {
             TareoDatabase::class.java,
             "tareo_database"
         )
-        .addMigrations(TareoDatabase.MIGRATION_2_3)
+        .addMigrations(TareoDatabase.MIGRATION_2_3, TareoDatabase.MIGRATION_3_4)
         .build()
     }
 

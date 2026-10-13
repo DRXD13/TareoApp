@@ -25,4 +25,7 @@ interface CrewTareoDao {
 
     @Query("UPDATE crew_tareos SET syncStatus = :status, syncedAtMillis = :syncedAt WHERE id = :id")
     suspend fun updateSyncStatus(id: String, status: SyncStatus, syncedAt: Long?): Int
+
+    @Query("SELECT * FROM crew_tareos")
+    suspend fun getAllSync(): List<CrewTareoEntity>
 }

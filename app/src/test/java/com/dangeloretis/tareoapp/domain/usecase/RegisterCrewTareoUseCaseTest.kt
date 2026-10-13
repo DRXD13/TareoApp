@@ -28,6 +28,7 @@ class RegisterCrewTareoUseCaseTest {
         override suspend fun getWorkerByDni(dni: String): Worker? {
             return if (dni == "11111111") Worker("11111111", "Juan Perez") else null
         }
+        override suspend fun getAllWorkers(): List<Worker> = emptyList()
     }
 
     private val fakeCrewTareoRepository = object : CrewTareoRepository {
@@ -42,6 +43,7 @@ class RegisterCrewTareoUseCaseTest {
         ): Boolean {
             return hasRegistered
         }
+        override suspend fun getAllTareos(): List<CrewTareoEntity> = emptyList()
     }
 
     @Before
