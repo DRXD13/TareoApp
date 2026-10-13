@@ -10,9 +10,10 @@ import javax.inject.Inject
 class CalculateWorkedHoursUseCase @Inject constructor() {
     operator fun invoke(attendances: List<Attendance>, date: Instant, zoneId: ZoneId = ZoneId.systemDefault()): WorkedHoursResult {
         val targetDate = date.atZone(zoneId).toLocalDate()
-        val dayAttendances = attendances.filter { 
-            Instant.ofEpochMilli(it.deviceTimeMillis).atZone(zoneId).toLocalDate() == targetDate
-        }.sortedBy { it.deviceTimeMillis }
+        val dayAttendances = attendances
+            .filter { Instant.ofEpochMilli(it.deviceTimeMillis).atZone(zoneId).toLocalDate() == targetDate }
+            .distinctBy { Pair(it.type, it.deviceTimeMillis) }
+            .sortedBy { it.deviceTimeMillis }
 
         if (dayAttendances.isEmpty()) return WorkedHoursResult(0.0, 0L, false)
 

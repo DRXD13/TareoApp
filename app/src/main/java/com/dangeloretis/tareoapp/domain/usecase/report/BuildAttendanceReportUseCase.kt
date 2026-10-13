@@ -89,7 +89,13 @@ class BuildAttendanceReportUseCase @Inject constructor(
                 val state = when {
                     !isWorkDay -> {
                         if (hasEntry) {
-                            if (hoursResult.isIncomplete) DailyState.JORNADA_INCOMPLETA else DailyState.PUNTUAL
+                            if (hoursResult.isIncomplete) {
+                                DailyState.JORNADA_INCOMPLETA
+                            } else if (latenessMinutes > 0) {
+                                DailyState.TARDANZA
+                            } else {
+                                DailyState.PUNTUAL
+                            }
                         } else {
                             DailyState.NO_LABORABLE
                         }
