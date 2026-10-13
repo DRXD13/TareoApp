@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -12,21 +13,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dangeloretis.tareoapp.R
+import com.dangeloretis.tareoapp.domain.usecase.report.DailyState
 import com.dangeloretis.tareoapp.domain.usecase.report.WorkerReport
+import com.dangeloretis.tareoapp.util.formatHoursMinutes
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import com.dangeloretis.tareoapp.util.formatHoursMinutes
+import java.util.Locale
 
-import androidx.compose.ui.res.pluralStringResource
-
-import androidx.compose.ui.platform.LocalContext
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AdminReportsScreen(
     modifier: Modifier = Modifier,
@@ -52,95 +54,95 @@ fun AdminReportsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                DateRange.entries.forEach { range ->
-                    val rangeName = when (range) {
-                        DateRange.TODAY -> stringResource(R.string.report_today)
-                        DateRange.LAST_7_DAYS -> stringResource(R.string.report_last_7_days)
-                        DateRange.THIS_MONTH -> stringResource(R.string.report_this_month)
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    DateRange.entries.forEach { range ->
+                        val rangeName = when (range) {
+                            DateRange.TODAY -> stringResource(R.string.report_today)
+                            DateRange.LAST_7_DAYS -> stringResource(R.string.report_last_7_days)
+                            DateRange.THIS_MONTH -> stringResource(R.string.report_this_month)
+                        }
+                        FilterChip(
+                            selected = state.selectedDateRange == range,
+                            onClick = { viewModel.setDateRange(range) },
+                            label = { Text(rangeName) }
+                        )
                     }
-                    FilterChip(
-                        selected = state.selectedDateRange == range,
-                        onClick = { viewModel.setDateRange(range) },
-                        label = { Text(rangeName) }
-                    )
                 }
             }
-        }
-        
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val presentesTitle = if (state.selectedDateRange == DateRange.TODAY) stringResource(R.string.report_present) else stringResource(R.string.report_attendances)
-                SummaryCard(title = presentesTitle, value = state.summaryPresent.toString(), modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.width(8.dp))
-                SummaryCard(title = stringResource(R.string.report_lateness), value = state.summaryLateness.toString(), modifier = Modifier.weight(1f))
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                SummaryCard(title = stringResource(R.string.report_absence), value = state.summaryAbsence.toString(), modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.width(8.dp))
-                
-                val totalMinutesForSummary = state.reports.sumOf { it.totalMinutesWorked }
-                SummaryCard(title = stringResource(R.string.report_hours), value = totalMinutesForSummary.formatHoursMinutes(), modifier = Modifier.weight(1f))
-            }
-        }
-
-        item {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = { viewModel.exportToCsv(context) },
-                    modifier = Modifier.fillMaxWidth()
+            
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(stringResource(R.string.export_csv))
+                    val presentesTitle = if (state.selectedDateRange == DateRange.TODAY) stringResource(R.string.report_present) else stringResource(R.string.report_attendances)
+                    SummaryCard(title = presentesTitle, value = state.summaryPresent.toString(), modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    SummaryCard(title = stringResource(R.string.report_lateness), value = state.summaryLateness.toString(), modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    OutlinedButton(
-                        onClick = { viewModel.loadMockData() },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.load_mocks))
-                    }
-                    OutlinedButton(
-                        onClick = { viewModel.clearMockData() },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.clear_mocks))
-                    }
+                    SummaryCard(title = stringResource(R.string.report_absence), value = state.summaryAbsence.toString(), modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    val totalMinutesForSummary = state.reports.sumOf { it.totalMinutesWorked }
+                    SummaryCard(title = stringResource(R.string.report_hours), value = totalMinutesForSummary.formatHoursMinutes(), modifier = Modifier.weight(1f))
                 }
             }
-        }
 
-        if (state.tareosPorLabor.isNotEmpty()) {
             item {
-                Text(stringResource(R.string.tareo_por_labor), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                state.tareosPorLabor.forEach { (key, count) ->
-                    Text("$key: ${pluralStringResource(R.plurals.registros_count, count, count)}")
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = { viewModel.exportToCsv(context) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.export_csv))
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { viewModel.loadMockData() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(R.string.load_mocks))
+                        }
+                        OutlinedButton(
+                            onClick = { viewModel.clearMockData() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(R.string.clear_mocks))
+                        }
+                    }
                 }
             }
-        }
 
-        item {
-            Text(stringResource(R.string.detail_by_worker), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        }
+            if (state.tareosPorLabor.isNotEmpty()) {
+                item {
+                    Text(stringResource(R.string.tareo_por_labor), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    state.tareosPorLabor.forEach { (key, count) ->
+                        Text("$key: ${pluralStringResource(R.plurals.registros_count, count, count)}")
+                    }
+                }
+            }
 
-        items(state.reports) { report ->
-            WorkerReportItem(report)
+            item {
+                Text(stringResource(R.string.detail_by_worker), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            }
+
+            items(state.reports) { report ->
+                WorkerReportItem(report)
+            }
         }
-    }
     }
 }
 
@@ -157,6 +159,56 @@ fun SummaryCard(title: String, value: String, modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun StateChip(state: DailyState) {
+    val (labelRes, containerColor, contentColor) = when (state) {
+        DailyState.PUNTUAL -> Triple(
+            R.string.state_puntual,
+            Color(0xFFE8F5E9),
+            Color(0xFF2E7D32)
+        )
+        DailyState.TARDANZA -> Triple(
+            R.string.state_tardanza,
+            Color(0xFFFFF3E0),
+            Color(0xFFE65100)
+        )
+        DailyState.FALTA -> Triple(
+            R.string.state_falta,
+            Color(0xFFFFEBEE),
+            Color(0xFFC62828)
+        )
+        DailyState.JORNADA_INCOMPLETA -> Triple(
+            R.string.state_jornada_incompleta,
+            Color(0xFFEEEEEE),
+            Color(0xFF616161)
+        )
+        DailyState.PENDIENTE -> Triple(
+            R.string.state_pendiente,
+            Color(0xFFF5F5F5),
+            Color(0xFF757575)
+        )
+        DailyState.NO_LABORABLE -> Triple(
+            R.string.state_no_laborable,
+            Color(0xFFFAFAFA),
+            Color(0xFF9E9E9E)
+        )
+    }
+
+    Surface(
+        color = containerColor,
+        contentColor = contentColor,
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(
+            text = stringResource(labelRes),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun WorkerReportItem(report: WorkerReport) {
     var expanded by remember { mutableStateOf(false) }
@@ -187,19 +239,25 @@ fun WorkerReportItem(report: WorkerReport) {
 
             AnimatedVisibility(visible = expanded) {
                 Column(modifier = Modifier.padding(top = 16.dp)) {
+                    val spanishLocale = Locale.forLanguageTag("es-ES")
+                    val datePattern = DateTimeFormatter.ofPattern("EEE dd/MM", spanishLocale).withZone(ZoneId.systemDefault())
+
                     report.dailyReports.forEach { daily ->
-                        val dateStr = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault()).format(daily.date)
+                        val rawDateStr = datePattern.format(daily.date)
+                        val dateStr = rawDateStr.replaceFirstChar { if (it.isLowerCase()) it.titlecase(spanishLocale) else it.toString() }
+                        
                         val formatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
                         val entryStr = daily.firstEntry?.let { formatter.format(java.time.Instant.ofEpochMilli(it.deviceTimeMillis)) } ?: "--:--"
                         val exitStr = daily.lastExit?.let { formatter.format(java.time.Instant.ofEpochMilli(it.deviceTimeMillis)) } ?: "--:--"
                         
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                        Row(
+                        FlowRow(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalArrangement = Arrangement.Center
                         ) {
                             Text(dateStr, fontWeight = FontWeight.Medium)
-                            Text(daily.state.name, color = if (daily.state.name == "PUNTUAL") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                            StateChip(state = daily.state)
                         }
                         Text("Entrada: $entryStr - Salida: $exitStr")
                         Text("Horas: ${daily.minutesWorked.formatHoursMinutes()}")

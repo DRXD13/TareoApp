@@ -95,4 +95,10 @@
         <item quantity="other">%1$d registros</item>
     </plurals>
     <string name="detail_by_worker">Detalle por trabajador</string>
+    <string name="state_puntual">Puntual</string>
+    <string name="state_tardanza">Tardanza</string>
+    <string name="state_falta">Falta</string>
+    <string name="state_jornada_incompleta">Jornada incompleta</string>
+    <string name="state_pendiente">Pendiente</string>
+    <string name="state_no_laborable">No laborable</string>
 </resources>

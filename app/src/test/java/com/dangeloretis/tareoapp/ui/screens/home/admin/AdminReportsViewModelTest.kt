@@ -76,15 +76,16 @@ class AdminReportsViewModelTest {
         override fun getLotes() = flowOf(emptyList<Lote>())
     }
 
+    private val defaultClock = Clock.fixed(Instant.parse("2023-10-16T12:00:00Z"), ZoneId.of("UTC"))
+
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         
-        val clock = Clock.fixed(Instant.parse("2023-10-16T12:00:00Z"), ZoneId.of("UTC"))
         val buildUseCase = BuildAttendanceReportUseCase(
             CalculateWorkedHoursUseCase(),
             DetectLatenessUseCase(),
-            clock
+            defaultClock
         )
 
         viewModel = AdminReportsViewModel(
@@ -92,7 +93,8 @@ class AdminReportsViewModelTest {
             workerDirectoryRepository = mockWorkerRepo,
             crewTareoRepository = mockCrewTareoRepo,
             catalogRepository = mockCatalogRepo,
-            buildAttendanceReportUseCase = buildUseCase
+            buildAttendanceReportUseCase = buildUseCase,
+            clock = defaultClock
         )
     }
 
@@ -113,5 +115,34 @@ class AdminReportsViewModelTest {
         val workersWithHours = state.reports.count { it.totalHoursWorked > 0.0 }
         
         assertTrue("Expected at least 5 workers with hours, but found $workersWithHours", workersWithHours >= 5)
+    }
+
+    @Test
+    fun `loadMockData with clock at 05 30 generates no attendances for today`() = runTest {
+        val clockAt0530 = Clock.fixed(Instant.parse("2023-10-16T05:30:00Z"), ZoneId.of("UTC"))
+        val buildUseCase = BuildAttendanceReportUseCase(
+            CalculateWorkedHoursUseCase(),
+            DetectLatenessUseCase(),
+            clockAt0530
+        )
+        val vm = AdminReportsViewModel(
+            attendanceRepository = mockAttendanceRepo,
+            workerDirectoryRepository = mockWorkerRepo,
+            crewTareoRepository = mockCrewTareoRepo,
+            catalogRepository = mockCatalogRepo,
+            buildAttendanceReportUseCase = buildUseCase,
+            clock = clockAt0530
+        )
+        vm.setDateRange(DateRange.TODAY)
+        advanceUntilIdle()
+
+        vm.loadMockData()
+        advanceUntilIdle()
+
+        val allAttendances = mockAttendanceRepo.getAllAttendances()
+        val todayAttendances = allAttendances.filter {
+            Instant.ofEpochMilli(it.deviceTimeMillis).atZone(ZoneId.of("UTC")).toLocalDate() == Instant.parse("2023-10-16T05:30:00Z").atZone(ZoneId.of("UTC")).toLocalDate()
+        }
+        assertTrue("Expected 0 attendances for today when clock is at 05:30, but found ${todayAttendances.size}", todayAttendances.isEmpty())
     }
 }

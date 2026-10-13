@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.Clock
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.inject.Inject
@@ -62,7 +62,8 @@ class AdminReportsViewModel @Inject constructor(
     private val workerDirectoryRepository: WorkerDirectoryRepository,
     private val crewTareoRepository: CrewTareoRepository,
     private val catalogRepository: CatalogRepository,
-    private val buildAttendanceReportUseCase: BuildAttendanceReportUseCase
+    private val buildAttendanceReportUseCase: BuildAttendanceReportUseCase,
+    private val clock: Clock
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AdminReportsState())
@@ -85,7 +86,7 @@ class AdminReportsViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             val range = _state.value.selectedDateRange
             val zoneId = ZoneId.systemDefault()
-            val now = ZonedDateTime.now(zoneId)
+            val now = ZonedDateTime.now(clock).withZoneSameInstant(zoneId)
             
             val (startDate, endDate) = when (range) {
                 DateRange.TODAY -> Pair(
@@ -162,7 +163,8 @@ class AdminReportsViewModel @Inject constructor(
         viewModelScope.launch {
             val workers = getWorkers()
             val zoneId = ZoneId.systemDefault()
-            val now = ZonedDateTime.now(zoneId)
+            val now = ZonedDateTime.now(clock).withZoneSameInstant(zoneId)
+            val nowMillis = now.toInstant().toEpochMilli()
             
             val mockAttendances = mutableListOf<Attendance>()
             
@@ -171,51 +173,56 @@ class AdminReportsViewModel @Inject constructor(
                     val date = now.minusDays(i.toLong())
                     if (date.dayOfWeek !in com.dangeloretis.tareoapp.domain.model.WorkSchedule.WORK_DAYS) continue
                     
-                    // index % 3 logic for different states
                     val stateType = (index + i) % 4
                     if (stateType == 0) continue // Absent
                     
-                    val entryTime = if (stateType == 1) { // Late
-                        date.withHour(8).withMinute(20).toInstant().toEpochMilli()
+                    val entryTimeZDT = if (stateType == 1) { // Late
+                        date.withHour(8).withMinute(20).withSecond(0).withNano(0)
                     } else { // Punctual or Incomplete
-                        date.withHour(7).withMinute(50).toInstant().toEpochMilli()
+                        date.withHour(7).withMinute(50).withSecond(0).withNano(0)
                     }
+                    val entryMillis = entryTimeZDT.toInstant().toEpochMilli()
                     
-                    mockAttendances.add(
-                        Attendance(
-                            id = "mock_${UUID.randomUUID()}",
-                            userId = worker.dni,
-                            siteId = "demo_site_1",
-                            type = AttendanceType.CHECK_IN,
-                            latitude = 0.0,
-                            longitude = 0.0,
-                            accuracyMeters = 0f,
-                            deviceTimeMillis = entryTime,
-                            elapsedRealtimeMillis = 0L,
-                            isMockLocation = false,
-                            distanceMeters = 0f,
-                            syncStatus = SyncStatus.SYNCED
-                        )
-                    )
-                    
-                    if (stateType != 3) { // Complete shift
-                        val exitTime = date.withHour(17).withMinute(10).toInstant().toEpochMilli()
+                    if (entryMillis <= nowMillis) {
                         mockAttendances.add(
                             Attendance(
                                 id = "mock_${UUID.randomUUID()}",
                                 userId = worker.dni,
                                 siteId = "demo_site_1",
-                                type = AttendanceType.CHECK_OUT,
+                                type = AttendanceType.CHECK_IN,
                                 latitude = 0.0,
                                 longitude = 0.0,
                                 accuracyMeters = 0f,
-                                deviceTimeMillis = exitTime,
+                                deviceTimeMillis = entryMillis,
                                 elapsedRealtimeMillis = 0L,
                                 isMockLocation = false,
                                 distanceMeters = 0f,
                                 syncStatus = SyncStatus.SYNCED
                             )
                         )
+                        
+                        if (stateType != 3) { // Complete shift
+                            val exitTimeZDT = date.withHour(17).withMinute(10).withSecond(0).withNano(0)
+                            val exitMillis = exitTimeZDT.toInstant().toEpochMilli()
+                            if (exitMillis <= nowMillis) {
+                                mockAttendances.add(
+                                    Attendance(
+                                        id = "mock_${UUID.randomUUID()}",
+                                        userId = worker.dni,
+                                        siteId = "demo_site_1",
+                                        type = AttendanceType.CHECK_OUT,
+                                        latitude = 0.0,
+                                        longitude = 0.0,
+                                        accuracyMeters = 0f,
+                                        deviceTimeMillis = exitMillis,
+                                        elapsedRealtimeMillis = 0L,
+                                        isMockLocation = false,
+                                        distanceMeters = 0f,
+                                        syncStatus = SyncStatus.SYNCED
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }
